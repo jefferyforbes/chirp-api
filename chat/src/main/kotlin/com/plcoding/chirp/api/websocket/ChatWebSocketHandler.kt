@@ -1,7 +1,5 @@
 package com.plcoding.chirp.api.websocket
 
-import com.fasterxml.jackson.databind.JsonMappingException
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.plcoding.chirp.api.dto.ws.ChatParticipantsChangedDto
 import com.plcoding.chirp.api.dto.ws.DeleteMessageDto
 import com.plcoding.chirp.api.dto.ws.ErrorDto
@@ -22,6 +20,7 @@ import com.plcoding.chirp.domain.type.UserId
 import com.plcoding.chirp.service.ChatMessageService
 import com.plcoding.chirp.service.ChatService
 import com.plcoding.chirp.service.JwtService
+import com.rabbitmq.tools.jsonrpc.JsonRpcMappingException
 import jakarta.websocket.CloseReason
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
@@ -35,6 +34,8 @@ import org.springframework.web.socket.PongMessage
 import org.springframework.web.socket.TextMessage
 import org.springframework.web.socket.WebSocketSession
 import org.springframework.web.socket.handler.TextWebSocketHandler
+import tools.jackson.core.JacksonException
+import tools.jackson.databind.ObjectMapper
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
@@ -161,7 +162,7 @@ class ChatWebSocketHandler(
                     )
                 }
             }
-        } catch(e: JsonMappingException) {
+        } catch(e: JacksonException) {
             logger.warn("Could not parse message ${message.payload}", e)
             sendError(
                 session = userSession.session,
